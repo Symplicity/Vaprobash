@@ -7,13 +7,16 @@ echo ">>> Installing MariaDB"
 # default version
 MARIADB_VERSION='10.1'
 
-# Import repo key
-sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
+version=$(lsb_release -sr)
+if [[ $version == "16.04" ]]; then
+	echo ">>> Ubuntu 16.04 detected..."
+	sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+	sudo add-apt-repository -y "deb [arch=amd64,i386,ppc64el] http://nyc2.mirrors.digitalocean.com/mariadb/repo/$MARIADB_VERSION/ubuntu xenial main"
+else
+	sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
+	sudo add-apt-repository "deb [arch=amd64,i386] http://mirrors.accretive-networks.net/mariadb/repo/$MARIADB_VERSION/ubuntu trusty main"
+fi
 
-# Add repo for MariaDB
-sudo add-apt-repository "deb [arch=amd64,i386] http://mirrors.accretive-networks.net/mariadb/repo/$MARIADB_VERSION/ubuntu trusty main"
-
-# Update
 sudo apt-get update
 
 # Install MariaDB without password prompt
