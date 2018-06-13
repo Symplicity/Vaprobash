@@ -84,6 +84,10 @@ xdebug.scream=0
 xdebug.cli_color=1
 xdebug.show_local_vars=1
 
+xdebug.profiler_enable_trigger = 1
+xdebug.profiler_enable_trigger_value = 1
+xdebug.profiler_output_dir = /vagrant/tmp
+
 ; var_dump display
 xdebug.var_display_max_depth = 5
 xdebug.var_display_max_children = 256
