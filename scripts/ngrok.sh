@@ -13,6 +13,7 @@ else
     sudo unzip ngrok-stable-linux-amd64.zip
     sudo chmod +x ngrok
     sudo mv ngrok /usr/local/bin/ngrok
+    sudo mkdir /home/vagrant/.ngrok2
     sudo touch /home/vagrant/.ngrok2/ngrok.conf
     sudo echo "web_addr: 0.0.0.0:4040" | sudo tee -a /home/vagrant/.ngrok2/ngrok.conf
     sudo echo "authtoken: $1" | sudo tee -a /home/vagrant/.ngrok2/ngrok.conf
