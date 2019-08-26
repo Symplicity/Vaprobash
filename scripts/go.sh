@@ -21,8 +21,10 @@ else
     source /home/vagrant/.gvm/scripts/gvm
 
     if [[ $GO_VERSION -eq "latest" ]]; then
-        GO_VERSION=`curl -L 'https://golang.org/' | grep 'Build version' | awk '{print $3}' | awk -F\< '{ print $1 }' | rev | cut -c 2- | rev`
+        url="$(wget -qO- https://golang.org/dl/ | grep -oP 'https:\/\/dl\.google\.com\/go\/go([0-9\.]+)\.linux-amd64\.tar\.gz' | head -n 1 )"
+        GO_VERSION="$(echo $url | grep -oP 'go[0-9\.]+' | head -c -2 )"
     fi
+
     echo "Installing Go version "$GO_VERSION
     echo "This will also be the default version"
 
