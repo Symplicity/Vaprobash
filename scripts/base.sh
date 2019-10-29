@@ -22,14 +22,14 @@ sudo apt-get update
 # -qq implies -y --force-yes
 sudo apt-get install -qq curl unzip git-core ack-grep software-properties-common build-essential cachefilesd
 
-
-echo ">>> Installing *.xip.io self-signed SSL"
-
 HOST=$4
+
+echo ">>> Installing $HOST.xip.io self-signed SSL"
+
 SSL_DIR="/etc/ssl/xip.io"
-DOMAIN="*.xip.io"
+DOMAIN=".xip.io"
 PASSPHRASE="vaprobash"
-KEYLINK="$HOST$DOMAIN"
+KEYLINK=$HOST$DOMAIN
 
 SUBJ="
 C=US
@@ -43,7 +43,7 @@ emailAddress=vagrant
 
 sudo mkdir -p "$SSL_DIR"
 
-echo "[SAN]\nsubjectAltName=DNS:$KEYLINK,IP:$KEYLINK" | sudo tee -a /etc/ssl/openssl.cnf
+printf "[SAN]\nsubjectAltName=DNS:$KEYLINK,IP:$KEYLINK" | sudo tee -a /etc/ssl/openssl.cnf
 sudo sed -i '/.rnd/d' /etc/ssl/openssl.cnf
 sudo openssl genrsa -out "$SSL_DIR/$KEYLINK.key" 1024
 sudo openssl req -new \
