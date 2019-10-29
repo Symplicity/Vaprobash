@@ -36,7 +36,7 @@ C=US
 ST=Connecticut
 O=Vaprobash
 localityName=New Haven
-commonName=$DOMAIN
+commonName=$HOST$DOMAIN
 organizationalUnitName=vagrant
 emailAddress=vagrant
 "
