@@ -25,9 +25,11 @@ sudo apt-get install -qq curl unzip git-core ack-grep software-properties-common
 
 echo ">>> Installing *.xip.io self-signed SSL"
 
+HOST=$4
 SSL_DIR="/etc/ssl/xip.io"
 DOMAIN="*.xip.io"
 PASSPHRASE="vaprobash"
+KEYLINK="$HOST$DOMAIN"
 
 SUBJ="
 C=US
@@ -35,15 +37,25 @@ ST=Connecticut
 O=Vaprobash
 localityName=New Haven
 commonName=$DOMAIN
-organizationalUnitName=
-emailAddress=
+organizationalUnitName=vagrant
+emailAddress=vagrant
 "
 
 sudo mkdir -p "$SSL_DIR"
 
-sudo openssl genrsa -out "$SSL_DIR/xip.io.key" 1024
-sudo openssl req -new -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -key "$SSL_DIR/xip.io.key" -out "$SSL_DIR/xip.io.csr" -passin pass:$PASSPHRASE
-sudo openssl x509 -req -days 365 -in "$SSL_DIR/xip.io.csr" -signkey "$SSL_DIR/xip.io.key" -out "$SSL_DIR/xip.io.crt"
+echo "[SAN]\nsubjectAltName=DNS:$KEYLINK,IP:$KEYLINK" | sudo tee -a /etc/ssl/openssl.cnf
+sudo sed -i '/.rnd/d' /etc/ssl/openssl.cnf
+sudo openssl genrsa -out "$SSL_DIR/$KEYLINK.key" 1024
+sudo openssl req -new \
+-sha256 \
+-subj "$(echo -n "$SUBJ" | tr "\n" "/")" \
+-key "$SSL_DIR/$KEYLINK.key" \
+-out "$SSL_DIR/$KEYLINK.csr" \
+-extensions SAN \
+-config /etc/ssl/openssl.cnf \
+-passin pass:$PASSPHRASE
+
+sudo openssl x509 -req -days 365 -in "$SSL_DIR/$KEYLINK.csr" -signkey "$SSL_DIR/$KEYLINK.key" -out "$SSL_DIR/$KEYLINK.crt"
 
 # Setting up Swap
 

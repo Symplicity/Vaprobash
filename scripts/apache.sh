@@ -56,7 +56,7 @@ if [[ PHP_VERSION -eq 5 ]]; then
 	sudo a2dismod php5
 fi
 
-	sudo a2enmod rewrite actions ssl
+sudo a2enmod rewrite actions ssl
 curl --silent -L $github_url/helpers/vhost.sh > vhost
 sudo chmod guo+x vhost
 sudo mv vhost /usr/local/bin
