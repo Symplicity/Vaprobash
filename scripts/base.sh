@@ -33,29 +33,35 @@ KEYLINK=$HOST$DOMAIN
 
 SUBJ="
 C=US
-ST=Connecticut
-O=Vaprobash
-localityName=New Haven
-commonName=$HOST$DOMAIN
+commonName=$KEYLINK
 organizationalUnitName=vagrant
 emailAddress=vagrant
 "
 
 sudo mkdir -p "$SSL_DIR"
 
-printf "[SAN]\nsubjectAltName=DNS:$KEYLINK,IP:$KEYLINK" | sudo tee -a /etc/ssl/openssl.cnf
+ISINFILE=$(cat /etc/ssl/openssl.cnf | grep -c "subjectAltName=DNS:$KEYLINK,IP:$KEYLINK")
+if [[ $ISINFILE -eq 0 ]]; then
+    printf "[SAN]\nsubjectAltName=DNS:$KEYLINK,IP:$KEYLINK" | sudo tee -a /etc/ssl/openssl.cnf
+fi
+
+# remove random
 sudo sed -i '/.rnd/d' /etc/ssl/openssl.cnf
+
+# add key
 sudo openssl genrsa -out "$SSL_DIR/$KEYLINK.key" 1024
+
+# add cert
 sudo openssl req -new \
+-x509 \
+-days 365 \
 -sha256 \
 -subj "$(echo -n "$SUBJ" | tr "\n" "/")" \
 -key "$SSL_DIR/$KEYLINK.key" \
--out "$SSL_DIR/$KEYLINK.csr" \
+-out "$SSL_DIR/$KEYLINK.crt" \
 -extensions SAN \
 -config /etc/ssl/openssl.cnf \
 -passin pass:$PASSPHRASE
-
-sudo openssl x509 -req -days 365 -in "$SSL_DIR/$KEYLINK.csr" -signkey "$SSL_DIR/$KEYLINK.key" -out "$SSL_DIR/$KEYLINK.crt"
 
 # Setting up Swap
 

@@ -45,7 +45,7 @@ cat <<- _EOF_
     $ServerAlias
 
     DocumentRoot $DocumentRoot
-
+    Redirect permanent / https://$ServerName
 
     <Directory $DocumentRoot>
         Options -Indexes +FollowSymLinks +MultiViews
