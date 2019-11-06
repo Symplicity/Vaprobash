@@ -49,7 +49,7 @@ fi
 sudo sed -i '/.rnd/d' /etc/ssl/openssl.cnf
 
 # add key
-sudo openssl genrsa -out "$SSL_DIR/$KEYLINK.key" 1024
+sudo openssl genrsa -out "$SSL_DIR/$KEYLINK.key" 2048
 
 # add cert
 sudo openssl req -new \
