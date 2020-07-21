@@ -21,13 +21,17 @@ else
     source /home/vagrant/.gvm/scripts/gvm
 
     if [[ $GO_VERSION -eq "latest" ]]; then
-        url="$(wget -qO- https://golang.org/dl/ | grep -oP 'https:\/\/dl\.google\.com\/go\/go([0-9\.]+)\.linux-amd64\.tar\.gz' | head -n 1 )"
+        url="$(wget -qO- https://golang.org/dl/ | grep -oP '\/dl\/go([0-9\.]+)\.linux-amd64\.tar\.gz' | head -n 1 )"
         GO_VERSION="$(echo $url | grep -oP 'go[0-9\.]+' | head -c -2 )"
     fi
 
     echo "Installing Go version "$GO_VERSION
     echo "This will also be the default version"
-
-    gvm install $GO_VERSION --prefer-binary
-    gvm use $GO_VERSION --default
+    if [ -z "$GO_VERSION" ]
+    then
+        echo ">>>>>> GO Version not set !!!"
+    else
+        gvm install $GO_VERSION --prefer-binary
+        gvm use $GO_VERSION --default
+    fi
 fi
