@@ -75,6 +75,40 @@ else
     # xdebug Config if supported
     echo ">>> Checking for potential xdebug.ini file to configure"
     CAT_CMD="$(find "$PHP_PATH" -name xdebug.ini)"
+    XDEBUG_VERSION=$(/usr/bin/php -r "echo phpversion('xdebug');")
+    function version_gt() { test "$(printf '%s\n' "$@" | sort -V | head -n 1)" != "$1"; }
+
+    if version_gt "$XDEBUG_VERSION" "3.0.0"; then
+	  echo ">>> Updating xdebug configuration"
+      cat > "${CAT_CMD}" << EOF
+zend_extension=xdebug.so
+xdebug.mode=debug,profile
+xdebug.client_host=10.0.2.2
+xdebug.start_with_request=trigger
+xdebug.discover_client_host=0
+xdebug.client_port=9003
+xdebug.scream=0
+xdebug.cli_color=1
+xdebug.show_local_vars=1
+xdebug.log_level=0
+xdebug.idekey=PHPSTORM
+xdebug.trigger_value=StartProfileForMe
+xdebug.output_dir=/vagrant/tmp
+
+; var_dump display
+xdebug.var_display_max_depth = 5
+xdebug.var_display_max_children = 256
+xdebug.var_display_max_data = 1024
+EOF
+
+	# for cli scripts dont enable profiling
+	XDEBUG_PHP_CLI="$PHP_PATH/cli/conf.d/20-xdebug.ini"
+	sudo rm -f "${XDEBUG_PHP_CLI}"
+	sudo cp "${CAT_CMD}" "${XDEBUG_PHP_CLI}"
+	sudo sed -i '/xdebug.mode=debug,profile/d' "${XDEBUG_PHP_CLI}"
+	echo "xdebug.mode=debug" | sudo tee -a "${XDEBUG_PHP_CLI}"
+  echo ">>> xdebug configuration updated..."
+  else
     cat > "${CAT_CMD}" << EOF
 zend_extension=xdebug.so
 xdebug.remote_enable = 1
@@ -93,6 +127,7 @@ xdebug.var_display_max_depth = 5
 xdebug.var_display_max_children = 256
 xdebug.var_display_max_data = 1024
 EOF
+	fi
 
     # PHP Error Reporting Config
     sudo sed -i "s/error_reporting = .*/error_reporting = E_ALL/" "${PHP_PATH}"/fpm/php.ini
