@@ -17,6 +17,7 @@ COMPOSER_IS_INSTALLED=$?
 # Getting the arguments
 GITHUB_OAUTH=$1
 COMPOSER_PACKAGES=$2
+COMPOSER_VERSION=$3
 
 # True, if composer is not installed
 if [[ $COMPOSER_IS_INSTALLED -ne 0 ]]; then
@@ -38,8 +39,14 @@ if [[ $COMPOSER_IS_INSTALLED -ne 0 ]]; then
         # Doesn't seem to work do! The alias is only usefull from the moment you log in: vagrant ssh
         . /home/vagrant/.profile
     else
-        # Install Composer
-        curl -sS https://getcomposer.org/installer | php
+		if [[ $COMPOSER_VERSION != "" ]]; then
+			curl -O "https://getcomposer.org/download/$COMPOSER_VERSION/composer.phar"
+			chmod a+x composer.phar
+		else 
+        	# Install Composer
+        	curl -sS https://getcomposer.org/installer | php
+		fi
+
         sudo mv composer.phar /usr/local/bin/composer
     fi
 else
