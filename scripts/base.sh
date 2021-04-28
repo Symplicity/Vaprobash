@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+VERBOSE=$6
+if [[ $VERBOSE != true ]]; then
+   exec >/dev/null 2>&1
+fi
+
 echo "Setting Timezone & Locale to $3 & en_US.UTF-8"
 
 sudo ln -sf /usr/share/zoneinfo/$3 /etc/localtime
@@ -23,51 +28,12 @@ sudo apt-get update
 sudo apt-get install -qq curl unzip git-core ack-grep software-properties-common build-essential cachefilesd
 
 HOST=$4
-
-echo ">>> Installing $HOST.xip.io self-signed SSL"
-
-SSL_DIR="/etc/ssl/xip.io"
-DOMAIN=".xip.io"
-PASSPHRASE="vaprobash"
-KEYLINK=$HOST$DOMAIN
-
-SUBJ="
-C=US
-commonName=$KEYLINK
-organizationalUnitName=vagrant
-emailAddress=vagrant
-"
-
-sudo mkdir -p "$SSL_DIR"
-
-ISINFILE=$(cat /etc/ssl/openssl.cnf | grep -c "subjectAltName=DNS:$KEYLINK,IP:$KEYLINK")
-if [[ $ISINFILE -eq 0 ]]; then
-    printf "[SAN]\nsubjectAltName=DNS:$KEYLINK,IP:$KEYLINK" | sudo tee -a /etc/ssl/openssl.cnf
-fi
-
-# remove random
-sudo sed -i '/.rnd/d' /etc/ssl/openssl.cnf
-
-# add key
-sudo openssl genrsa -out "$SSL_DIR/$KEYLINK.key" 2048
-
-# add cert
-sudo openssl req -new \
--x509 \
--days 365 \
--sha256 \
--subj "$(echo -n "$SUBJ" | tr "\n" "/")" \
--key "$SSL_DIR/$KEYLINK.key" \
--out "$SSL_DIR/$KEYLINK.crt" \
--extensions SAN \
--config /etc/ssl/openssl.cnf \
--passin pass:$PASSPHRASE
-
-# Setting up Swap
+DOMAIN=$5
 
 # Disable case sensitivity
 shopt -s nocasematch
 
+# Setting up Swap
 if [[ ! -z $2 && ! $2 =~ false && $2 =~ ^[0-9]*$ ]]; then
 
     echo ">>> Setting up Swap ($2 MB)"

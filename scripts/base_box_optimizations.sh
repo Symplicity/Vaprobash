@@ -1,4 +1,8 @@
 #!/bin/bash
+VERBOSE=$1
+if [[ $VERBOSE != true ]]; then
+    exec >/dev/null 2>&1
+fi
 
 # exit script if not run as root
 if [[ $EUID -ne 0 ]]; then

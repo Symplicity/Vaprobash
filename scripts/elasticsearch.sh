@@ -1,60 +1,36 @@
 #!/usr/bin/env bash
 
+VERBOSE=$2
+if [[ $VERBOSE != true ]]; then
+    exec >/dev/null 2>&1
+fi
+
 echo ">>> Installing Elasticsearch"
 
 # Set some variables
 ELASTICSEARCH_VERSION=$1 # Check https://www.elastic.co/downloads/elasticsearch for latest version
 
-comp=$(awk 'BEGIN{ print "'$ELASTICSEARCH_VERSION'"<"'5.1.2'" }')
-elastic7=$(awk 'BEGIN{ print "'$ELASTICSEARCH_VERSION'"<"'7.0.0'" }')
+sudo add-apt-repository -y ppa:openjdk-r/ppa
+sudo apt-get update
+sudo apt-get -y install openjdk-8-jdk openjdk-8-jre
+wget --quiet https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ELASTICSEARCH_VERSION}-amd64.deb
+sudo dpkg -i elasticsearch-${ELASTICSEARCH_VERSION}-amd64.deb
+rm elasticsearch-${ELASTICSEARCH_VERSION}-amd64.deb
 
-# Install prerequisite: Java
-# -qq implies -y --force-yes
-if [ "$comp" -eq 1 ]; then
-    sudo apt-get update
-    sudo apt-get install -qq openjdk-7-jre-headless
-    wget --quiet https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-$ELASTICSEARCH_VERSION.deb
-else
-    sudo add-apt-repository -y ppa:openjdk-r/ppa
-    sudo apt-get update
-    sudo apt-get -y install openjdk-8-jdk openjdk-8-jre
-    if [ "$elastic7" -eq 1 ]; then
-      wget --quiet https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ELASTICSEARCH_VERSION}.deb
-    else
-      wget --quiet https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ELASTICSEARCH_VERSION}-amd64.deb
-    fi
-fi
-
-if [ "$elastic7" -eq 1 ]; then
-    sudo dpkg -i elasticsearch-$ELASTICSEARCH_VERSION.deb
-    rm elasticsearch-$ELASTICSEARCH_VERSION.deb
-	
-    # enable dynamic scripting
-    sudo echo "script.inline: on" >> /etc/elasticsearch/elasticsearch.yml
-else
-    sudo dpkg -i elasticsearch-${ELASTICSEARCH_VERSION}-amd64.deb
-    rm elasticsearch-${ELASTICSEARCH_VERSION}-amd64.deb
-
-    sudo echo "node.master: true" >> /etc/elasticsearch/elasticsearch.yml
-    sudo echo "node.name: vagrant" >> /etc/elasticsearch/elasticsearch.yml
-    sudo echo "cluster.initial_master_nodes: vagrant" >> /etc/elasticsearch/elasticsearch.yml
-    sudo echo "discovery.seed_hosts: []" >> /etc/elasticsearch/elasticsearch.yml
-fi
-
-# Configure Elasticsearch for development purposes (1 shard/no replicas, don't allow it to swap at all if it can run without swapping)
-sudo sed -i "s/# index.number_of_shards: 1/index.number_of_shards: 1/" /etc/elasticsearch/elasticsearch.yml
-sudo sed -i "s/# index.number_of_replicas: 0/index.number_of_replicas: 0/" /etc/elasticsearch/elasticsearch.yml
-sudo sed -i "s/# bootstrap.mlockall: true/bootstrap.mlockall: true/" /etc/elasticsearch/elasticsearch.yml
-
-# either of the next two lines is needed to be able to access "localhost:9200" from the host os
-sudo echo "network.bind_host: 0" >> /etc/elasticsearch/elasticsearch.yml
-sudo echo "network.host: 0.0.0.0" >> /etc/elasticsearch/elasticsearch.yml
-
-# enable cors (to be able to use Sense)
-# sudo echo "http.cors.enabled: true" >> /etc/elasticsearch/elasticsearch.yml
-sudo echo "http.cors.allow-origin: /https?:\/\/localhost(:[0-9]+)?/" >> /etc/elasticsearch/elasticsearch.yml
+if ! grep -q "node.master: true" "/etc/elasticsearch/elasticsearch.yml"; then
+	sudo echo "node.master: true" >> /etc/elasticsearch/elasticsearch.yml
+	sudo echo "node.name: vagrant" >> /etc/elasticsearch/elasticsearch.yml
+	sudo echo "cluster.initial_master_nodes: vagrant" >> /etc/elasticsearch/elasticsearch.yml
+	sudo echo "discovery.seed_hosts: []" >> /etc/elasticsearch/elasticsearch.yml
+	sudo sed -i "s/# index.number_of_shards: 1/index.number_of_shards: 1/" /etc/elasticsearch/elasticsearch.yml
+	sudo sed -i "s/# index.number_of_replicas: 0/index.number_of_replicas: 0/" /etc/elasticsearch/elasticsearch.yml
+	sudo sed -i "s/# bootstrap.mlockall: true/bootstrap.mlockall: true/" /etc/elasticsearch/elasticsearch.yml
+	sudo echo "network.bind_host: 0" >> /etc/elasticsearch/elasticsearch.yml
+	sudo echo "network.host: 0.0.0.0" >> /etc/elasticsearch/elasticsearch.yml
+	sudo echo "http.cors.allow-origin: /https?:\/\/localhost(:[0-9]+)?/" >> /etc/elasticsearch/elasticsearch.yml
+	sudo echo "action.auto_create_index: ".watches,.triggered_watches,.watcher-history-*"" | sudo tee -a /etc/elasticsearch/elasticsearch.yml
+fi 
 
 sudo service elasticsearch restart
 
-# Configure to start up Elasticsearch automatically
 sudo update-rc.d elasticsearch defaults 95 10

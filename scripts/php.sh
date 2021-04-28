@@ -2,10 +2,16 @@
 
 export LANG=C.UTF-8
 
+VERBOSE=$5
+if [[ $VERBOSE != true ]]; then
+    exec >/dev/null 2>&1
+fi
+
 PHP_TIMEZONE=$1
 HHVM=$2
 PHP_VERSION=$3
 PHP_PATH="/etc/php/$PHP_VERSION"
+PHP_PORT=$4
 
 if [[ $HHVM == "true" ]]; then
 
@@ -57,7 +63,7 @@ else
     fi
 
     # Set PHP FPM to listen on TCP instead of Socket
-    sudo sed -i "s/listen =.*/listen = 127.0.0.1:9000/" "${PHP_PATH}"/fpm/pool.d/www.conf
+    sudo sed -i "s/listen =.*/listen = 127.0.0.1:${PHP_PORT}/" "${PHP_PATH}"/fpm/pool.d/www.conf
 
     # Set PHP FPM allowed clients IP address
     sudo sed -i "s/;listen.allowed_clients/listen.allowed_clients/" "${PHP_PATH}"/fpm/pool.d/www.conf

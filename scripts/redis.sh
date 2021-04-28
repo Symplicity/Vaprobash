@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+VERBOSE=$2
+if [[ $VERBOSE != true ]]; then
+    exec >/dev/null 2>&1
+fi
+
 echo ">>> Installing Redis"
 
 # Add repository

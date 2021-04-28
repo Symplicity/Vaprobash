@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+VERBOSE=$4
+if [[ $VERBOSE != true ]]; then
+    exec >/dev/null 2>&1
+fi
+
 # Test if PHP is installed
 php -v > /dev/null 2>&1
 PHP_IS_INSTALLED=$?
