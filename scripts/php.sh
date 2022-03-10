@@ -89,7 +89,7 @@ else
       cat > "${CAT_CMD}" << EOF
 zend_extension=xdebug.so
 xdebug.mode=debug,profile
-xdebug.client_host=10.0.2.2
+xdebug.client_host=192.168.10.1
 xdebug.start_with_request=trigger
 xdebug.discover_client_host=0
 xdebug.client_port=9003
