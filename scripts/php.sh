@@ -107,11 +107,13 @@ xdebug.var_display_max_children = 256
 xdebug.var_display_max_data = 1024
 EOF
 
-	# for cli scripts dont enable profiling
+	# for cli scripts dont enable profiling, for more info set log_level=10
 	XDEBUG_PHP_CLI="$PHP_PATH/cli/conf.d/20-xdebug.ini"
 	sudo rm -f "${XDEBUG_PHP_CLI}"
 	sudo cp "${CAT_CMD}" "${XDEBUG_PHP_CLI}"
 	sudo sed -i '/xdebug.mode=debug,profile/d' "${XDEBUG_PHP_CLI}"
+	sudo sed -i '/xdebug.start_with_request=trigger/d' "${XDEBUG_PHP_CLI}"
+	sudo sed -i '/xdebug.trigger_value=StartProfileForMe/d' "${XDEBUG_PHP_CLI}"
 	echo "xdebug.mode=debug" | sudo tee -a "${XDEBUG_PHP_CLI}"
   echo ">>> xdebug configuration updated..."
   else
