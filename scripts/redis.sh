@@ -8,7 +8,6 @@ fi
 echo ">>> Installing Redis"
 
 # Add repository
-sudo apt-add-repository ppa:chris-lea/redis-server -y
 sudo apt-get update
 
 # Install Redis
