@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [[ -z $1 ]]; then
-        KIBANA_VERSION="7.6.0"
+        KIBANA_VERSION="8.19.12"
 else
         KIBANA_VERSION=$1
 fi
@@ -13,6 +13,6 @@ fi
 
 echo ">>> Installing Kibana $KIBANA_VERSION"
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+echo "deb https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-8.x.list
 sudo apt-get update && sudo apt-get install -qq kibana=$1
 sudo systemctl restart kibana
