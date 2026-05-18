@@ -56,7 +56,36 @@ else
 
     # Install PHP
     # -qq implies -y --force-yes
-	sudo apt-get install -qq php$PHP_VERSION-cli php$PHP_VERSION-fpm php$PHP_VERSION-mysql php$PHP_VERSION-pgsql php$PHP_VERSION-sqlite php$PHP_VERSION-curl php$PHP_VERSION-gd php$PHP_VERSION-gmp php$PHP_VERSION-xml php$PHP_VERSION-memcached php$PHP_VERSION-redis php$PHP_VERSION-imagick php$PHP_VERSION-intl php$PHP_VERSION-xdebug php$PHP_VERSION-mailparse
+	sudo apt-get install -qq php$PHP_VERSION-cli \ 
+        php$PHP_VERSION-fpm \
+        php$PHP_VERSION-mysql \
+        php$PHP_VERSION-pgsql \
+        php$PHP_VERSION-sqlite \
+        php$PHP_VERSION-curl \
+        php$PHP_VERSION-gd \
+        php$PHP_VERSION-gmp \
+        php$PHP_VERSION-xml \
+        php$PHP_VERSION-memcached \
+        php$PHP_VERSION-redis \
+        php$PHP_VERSION-imagick \
+        php$PHP_VERSION-intl \
+        php$PHP_VERSION-xdebug \
+        php$PHP_VERSION-mailparse \
+        php$PHP_VERSION-ldap \
+        php$PHP_VERSION-mbstring \
+        php-pear \
+        php$PHP_VERSION-dev \
+        pv \
+        php$PHP_VERSION-bcmath \
+        php$PHP_VERSION-tidy \
+        imagemagick \
+        php$PHP_VERSION-bcmath \
+        php$PHP_VERSION-mbstring \
+        openconnect \
+        php$PHP_VERSION-zip \
+        whois \
+        mysql-client \
+        php$PHP_VERSION-pcov
 
     if [ $PHP_VERSION < "7.2" ]; then
 		sudo apt-get install -qq php$PHP_VERSION-mcrypt
@@ -76,6 +105,10 @@ else
     sudo sed -i "s/listen\.owner.*/listen.owner = vagrant/" "${PHP_PATH}"/fpm/pool.d/www.conf
     sudo sed -i "s/listen\.group.*/listen.group = vagrant/" "${PHP_PATH}"/fpm/pool.d/www.conf
     sudo sed -i "s/listen\.mode.*/listen.mode = 0666/" "${PHP_PATH}"/fpm/pool.d/www.conf
+
+    sudo sed -i "s/short_open_tag = .*/short_open_tag = On/" "${PHP_PATH}"/fpm/php.ini
+    sudo sed -i "s/short_open_tag = .*/short_open_tag = On/" "${PHP_PATH}"/cli/php.ini
+    sudo sed -i "s/error_reporting = .*/error_reporting = E_ALL/" "${PHP_PATH}"/cli/php.ini
 
 
     # xdebug Config if supported
