@@ -56,7 +56,7 @@ else
 
     # Install PHP
     # -qq implies -y --force-yes
-	sudo apt-get install -qq php$PHP_VERSION-cli \ 
+	sudo apt-get install -qq php$PHP_VERSION-cli \
         php$PHP_VERSION-fpm \
         php$PHP_VERSION-mysql \
         php$PHP_VERSION-pgsql \
